@@ -66,7 +66,7 @@ const fastify = Fastify({
     })
     fastify.register(proxy, {
         upstream: process.env.API_SERVICE_URL,
-        prefix: '/api',
+        prefix: '',
         proxyPayloads: false,
     })
 
