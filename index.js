@@ -17,7 +17,10 @@ const fastify = Fastify({
 
 
 (async ()=>{
-    fastify.register(cors)
+    fastify.register(cors,{
+        origin: true,
+        preflight: true
+    })
     fastify.addHook('preValidation',async (req, rep)=>{
         if(req.method === 'POST'){
             try {
