@@ -2,6 +2,7 @@ import 'dotenv/config'
 import Fastify from 'fastify'
 import NodeCache from 'node-cache'
 import proxy from '@fastify/http-proxy'
+import cors from '@fastify/cors'
 import fs from 'fs'
 
 
@@ -16,6 +17,7 @@ const fastify = Fastify({
 
 
 (async ()=>{
+    fastify.register(cors)
     fastify.addHook('preValidation',async (req, rep)=>{
         if(req.method === 'POST'){
             try {
