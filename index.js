@@ -18,10 +18,15 @@ const fastify = Fastify({
 
 (async ()=>{
     fastify.register(cors,{
-        origin: true,
-        preflight: true
+        maxAge: 7200,
+        preflight: false,
+        preflightContinue: true
     })
+
     fastify.addHook('preValidation',async (req, rep)=>{
+        if(req.method === 'OPTIONS'){
+            rep.header('Cache-Control', 'public, max-age=86400')
+        }
         if(req.method === 'POST'){
             try {
                 
@@ -29,7 +34,7 @@ const fastify = Fastify({
                 throw new Error('Must have a body')
             }
             const body = req.body;
-            console.log(body);
+            // console.log(body);
 
             const params = body.params;
             if(!params) {
