@@ -9,7 +9,7 @@ import fs from 'fs'
 const appCache = new NodeCache({
     deleteOnExpire: true,
     // 15 mins in seconds
-    stdTTL: 15 * 60,
+    stdTTL: 5 * 60,
 });
 const fastify = Fastify({
     logger: true
@@ -18,10 +18,14 @@ const fastify = Fastify({
 
 (async ()=>{
     fastify.register(cors,{
-        origin: true,
-        preflight: true
+	maxAge: 7200,
+        preflight: false,
+        preflightContinue: true
     })
     fastify.addHook('preValidation',async (req, rep)=>{
+	if(req.method === 'OPTIONS'){
+            rep.header('Cache-Control', 'public, max-age=86400')
+	}
         if(req.method === 'POST'){
             try {
                 
@@ -58,7 +62,7 @@ const fastify = Fastify({
                     }
                 }
                 const jsonWhitelist = JSON.parse(whiteList)
-                if(!jsonWhitelist.addresses.includes(data.from.toLowerCase())){
+                if(!jsonWhitelist.addresses.map(adr => adr.toLowerCase()).includes(data.from.toLowerCase())){
                     throw new Error('You have to own the nft. If you just got the nft wait 15 mins.')
                 }
             }
@@ -75,7 +79,7 @@ const fastify = Fastify({
         proxyPayloads: false,
     })
 
-    fastify.listen({port: 3005}, (err, address) => {
+    fastify.listen({port: 3005, host: '127.0.0.1'}, (err, address) => {
         if (err) {
             fastify.log.error(err);
             process.exit(1);
